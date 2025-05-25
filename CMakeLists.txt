@@ -11,6 +11,14 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+if (GFX_EMBEDDED)
+  add_compile_options(-DGFX_EMBEDDED)
+endif()
+
+if (NOT WIN32)
+add_compile_options(-Wall -Werror)
+endif()
+
 project(yourProjectName VERSION 1.0.0)
 
 find_package(studious REQUIRED)

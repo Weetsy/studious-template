@@ -6,60 +6,40 @@
  *       engine is compiled and ran.
  * @version 0.1
  * @date 2023-07-28
- * 
+ *
  * @copyright Copyright (c) 2023
- * 
+ *
  */
 #include <string>
 #include <vector>
 #include <iostream>
 #include <cstdio>
-#ifndef GFX_EMBEDDED
 #include <OpenGlGfxController.hpp>
-#else
-#include <OpenGlEsGfxController.hpp>
-#endif
 #include <AnimationController.hpp>
 #include <GameInstance.hpp>
 
 // Lists of embedded/core shaders
 #ifndef GFX_EMBEDDED
-vector<string> fragShaders = {
-    "shaders/core/gameObject.frag",
-    "shaders/core/colliderObject.frag",
-    "shaders/core/textObject.frag",
-    "shaders/core/spriteObject.frag",
-    "shaders/core/uiObject.frag"
-};  // Contains collider renderer and basic object renderer.
-vector<string> vertShaders = {
-    "shaders/core/gameObject.vert",
-    "shaders/core/colliderObject.vert",
-    "shaders/core/textObject.vert",
-    "shaders/core/spriteObject.vert",
-    "shaders/core/uiObject.vert"
-};  // Contains collider renderer and basic object renderer.
+vector<ProgramData> programs = {
+    { "gameObject", "shaders/core/gameObject.vert", "shaders/core/gameObject.frag" },
+    { "colliderObject", "shaders/core/colliderObject.vert", "shaders/core/colliderObject.frag" },
+    { "textObject", "shaders/core/textObject.vert", "shaders/core/textObject.frag" },
+    { "spriteObject", "shaders/core/spriteObject.vert", "shaders/core/spriteObject.frag" },
+    { "uiObject", "shaders/core/uiObject.vert", "shaders/core/uiObject.frag" },
+    { "tileObject", "shaders/core/tileObject.vert", "shaders/core/tileObject.frag" }
+};
 #else
-vector<string> fragShaders = {
-    "shaders/es/gameObject.frag",
-    "shaders/es/colliderObject.frag",
-    "shaders/es/textObject.frag",
-    "shaders/es/spriteObject.frag",
-    "shaders/es/uiObject.frag"
-};  // Contains collider renderer and basic object renderer.
-vector<string> vertShaders = {
-    "shaders/es/gameObject.vert",
-    "shaders/es/colliderObject.vert",
-    "shaders/es/textObject.vert",
-    "shaders/es/spriteObject.vert",
-    "shaders/es/uiObject.vert"
-};  // Contains collider renderer and basic object renderer.
+vector<ProgramData> programs = {
+    { "gameObject", "shaders/es/gameObject.vert", "shaders/es/gameObject.frag" },
+    { "colliderObject", "shaders/es/colliderObject.vert", "shaders/es/colliderObject.frag" },
+    { "textObject", "shaders/es/textObject.vert", "shaders/es/textObject.frag" },
+    { "spriteObject", "shaders/es/spriteObject.vert", "shaders/es/spriteObject.frag" },
+    { "uiObject", "shaders/es/uiObject.vert", "shaders/es/uiObject.frag" },
+    { "tileObject", "shaders/es/tileObject.vert", "shaders/es/tileObject.frag" }
+};
 #endif
 
-#ifdef GFX_EMBEDDED
-OpenGlEsGfxController gfxController = OpenGlEsGfxController();
-#else
 OpenGlGfxController gfxController = OpenGlGfxController();
-#endif
 AnimationController animationController;
 
 int runtime(GameInstance *currentGame);
@@ -77,8 +57,7 @@ int main(int argc, char **argv) {
         width = 1280;
         height = 720;
     }
-    GameInstance currentGame(vertShaders, fragShaders, &gfxController, width, height);
-    currentGame.startGame(config);
+    GameInstance currentGame(&gfxController, &animationController, width, height);
     errorNum = runtime(&currentGame);
     return errorNum;
 }
@@ -116,19 +95,16 @@ int runtime(GameInstance *currentGame) {
 */
 int mainLoop(GameInstance *currentGame, CameraObject *currentCamera) {
     Uint64 begin, end;
-    int running = 1;
     double currentTime = 0.0, sampleTime = 1.0;
     int error = 0;
     vector<double> times;
-    while (running) {
+    while (!currentGame->isShutDown()) {
         begin = SDL_GetPerformanceCounter();
-        running = currentGame->isWindowOpen();
-        error = currentGame->updateObjects();
-        error |= currentGame->updateWindow();
+        if (currentGame->getKeystate()[SDL_SCANCODE_ESCAPE]) currentGame->shutdown();
+        error = currentGame->update();
         if (error) {
             return error;
         }
-        animationController.update();
         end = SDL_GetPerformanceCounter();
         // Update player position
         deltaTime = static_cast<double>(end - begin) / (SDL_GetPerformanceFrequency());
