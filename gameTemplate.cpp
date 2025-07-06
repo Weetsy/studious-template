@@ -100,7 +100,7 @@ int mainLoop(GameInstance *currentGame, CameraObject *currentCamera) {
     vector<double> times;
     while (!currentGame->isShutDown()) {
         begin = SDL_GetPerformanceCounter();
-        if (currentGame->getKeystate()[SDL_SCANCODE_ESCAPE]) currentGame->shutdown();
+        if (currentGame->pollInput(GameInput::QUIT)) currentGame->shutdown();
         error = currentGame->update();
         if (error) {
             return error;
