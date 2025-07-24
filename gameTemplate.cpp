@@ -58,6 +58,11 @@ int main(int argc, char **argv) {
         height = 720;
     }
     GameInstance currentGame(&gfxController, &animationController, width, height);
+    currentGame.configureVsync(config.enableVsync);
+    // Load shader programs
+    for (auto program : programs) {
+        gfxController.loadShaders(program.programName, program.vertexShaderPath, program.fragmentShaderPath);
+    }
     errorNum = runtime(&currentGame);
     return errorNum;
 }
