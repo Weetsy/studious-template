@@ -14,6 +14,7 @@
 #include <vector>
 #include <iostream>
 #include <cstdio>
+#include <physics.hpp>
 #include <OpenGlGfxController.hpp>
 #include <AnimationController.hpp>
 #include <GameInstance.hpp>
@@ -39,29 +40,22 @@ vector<ProgramData> programs = {
 };
 #endif
 
-OpenGlGfxController gfxController = OpenGlGfxController();
-AnimationController animationController;
+extern std::unique_ptr<GfxController> gfxController;
+extern std::unique_ptr<AnimationController> animationController;
+extern std::unique_ptr<PhysicsController> physicsController;
 
 int runtime(GameInstance *currentGame);
 int mainLoop(GameInstance *currentGame, CameraObject *currentCamera);
 
-int main(int argc, char **argv) {
+int main() {
     int errorNum;
-    configData config;
-    int flag = loadConfig(&config, "config.txt");
-    int width, height;
-    if (!flag) {
-        width = config.resX;
-        height = config.resY;
-    } else {
-        width = 1280;
-        height = 720;
-    }
-    GameInstance currentGame(&gfxController, &animationController, width, height);
-    currentGame.configureVsync(config.enableVsync);
+    auto config = StudiousConfig("config.txt");
+
+    GameInstance currentGame(config);
+
     // Load shader programs
     for (auto program : programs) {
-        gfxController.loadShaders(program.programName, program.vertexShaderPath, program.fragmentShaderPath);
+        gfxController.get()->loadShaders(program.programName, program.vertexShaderPath, program.fragmentShaderPath);
     }
     errorNum = runtime(&currentGame);
     return errorNum;
