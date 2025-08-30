@@ -14,6 +14,7 @@
 #include <vector>
 #include <iostream>
 #include <cstdio>
+#include <physics.hpp>
 #include <OpenGlGfxController.hpp>
 #include <AnimationController.hpp>
 #include <GameInstance.hpp>
@@ -41,6 +42,7 @@ vector<ProgramData> programs = {
 
 OpenGlGfxController gfxController = OpenGlGfxController();
 AnimationController animationController;
+PhysicsController physicsController(PHYS_THREADS);
 
 int runtime(GameInstance *currentGame);
 int mainLoop(GameInstance *currentGame, CameraObject *currentCamera);
@@ -57,7 +59,7 @@ int main(int argc, char **argv) {
         width = 1280;
         height = 720;
     }
-    GameInstance currentGame(&gfxController, &animationController, width, height);
+    GameInstance currentGame(&gfxController, &animationController, &physicsController, width, height);
     currentGame.configureVsync(config.enableVsync);
     // Load shader programs
     for (auto program : programs) {
