@@ -76,7 +76,7 @@ int runtime(GameInstance *currentGame) {
     SDL_SetRelativeMouseMode(SDL_FALSE);
     cout << "Creating camera.\n";
 
-    auto currentCamera = currentGame->createCamera(nullptr, vec3(0), 0.0, 16.0 / 9.0, 4.0, 90.0);
+    auto currentCamera = currentGame->createCamera(nullptr, vec3(0), 0.0, 16.0 / 9.0, 4.0, 90.0, "mainCamera");
     /*
      End Scene Loading
      */
