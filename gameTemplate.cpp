@@ -52,6 +52,7 @@ int main() {
     auto config = StudiousConfig("config.txt");
 
     GameInstance currentGame(config);
+    currentGame.createGameScene("demo-scene");
 
     // Load shader programs
     for (auto program : programs) {
