@@ -43,6 +43,7 @@ vector<ProgramData> programs = {
 extern std::unique_ptr<GfxController> gfxController;
 extern std::unique_ptr<AnimationController> animationController;
 extern std::unique_ptr<PhysicsController> physicsController;
+extern std::unique_ptr<InputController> inputController;
 
 int runtime(GameInstance *currentGame);
 int mainLoop(GameInstance *currentGame, CameraObject *currentCamera);
@@ -100,7 +101,7 @@ int mainLoop(GameInstance *currentGame, CameraObject *currentCamera) {
     vector<double> times;
     while (!currentGame->isShutDown()) {
         begin = SDL_GetPerformanceCounter();
-        if (currentGame->pollInput(GameInput::QUIT)) currentGame->shutdown();
+        if (inputController->pollInput(GameInput::QUIT)) currentGame->shutdown();
         error = currentGame->update();
         if (error) {
             return error;
